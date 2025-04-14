@@ -27,9 +27,13 @@ public class Reclamation {
     private String salle;
     private String status;
 
+
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",updatable = false , insertable = false)
     private String date;
 
     private Long userid;
+
+
+    private String photourl;
 }
