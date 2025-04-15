@@ -3,6 +3,7 @@ package org.example.backendenicargy.controllers;
 import jakarta.validation.Valid;
 import org.example.backendenicargy.Reclamation;
 import org.example.backendenicargy.dto.ReclamationDTO;
+import org.example.backendenicargy.dto.ReclamationStatusDTO;
 import org.example.backendenicargy.repositories.ReclamationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,17 @@ public class ReclamationController {
         return reclamationRepository.findAll();
     }
 
+
+
+    @GetMapping("/api/v1/reclamation/stats/{userid}")
+    public ResponseEntity<ReclamationStatusDTO> getStatusCountsByUser(@PathVariable Long userId) {
+        long enAttenteCount = reclamationRepository.countByUseridAndStatus(userId, "En_Attente");
+        long enCoursCount = reclamationRepository.countByUseridAndStatus(userId, "En_cours");
+        long terminerCount = reclamationRepository.countByUseridAndStatus(userId, "Terminer");
+
+        ReclamationStatusDTO result = new ReclamationStatusDTO(enAttenteCount, enCoursCount, terminerCount);
+        return ResponseEntity.ok(result);
+    }
 
 
 
@@ -88,7 +100,7 @@ public class ReclamationController {
     ){
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(null);
+
             }
         String uploadDir = "uploads/";
         File dir = new File(uploadDir);
@@ -115,6 +127,139 @@ public class ReclamationController {
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //---------------------------------------------- Delete methode Route --------------------------------------------------------------------------------------
+
+    @DeleteMapping("api/v1/reclamations/{id}")
+    public ResponseEntity<String> deleteReclamation(@PathVariable Long id) {
+        Optional<Reclamation> optional = reclamationRepository.findById(id);
+
+        if (optional.isPresent()) {
+            Reclamation reclamation = optional.get();
+            // Delete the associated photo if it exists
+            if (reclamation.getPhotourl() != null) {
+                File photoFile = new File("uploads/" + reclamation.getPhotourl());
+                if (photoFile.exists()) {
+                    boolean deleted = photoFile.delete();
+                    System.out.println("Photo deleted: " + deleted);
+                }
+            }
+
+            reclamationRepository.deleteById(id);
+            return ResponseEntity.ok("Reclamation and associated photo deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Reclamation with ID " + id + " not found");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //-------------------------------------------Patch methodes-------------------------------------------------------------------
+    @PatchMapping("api/v1/reclamations/status/{id}")
+    public ResponseEntity<String> advanceReclamationStatus(@PathVariable Long id) {
+        Optional<Reclamation> optional = reclamationRepository.findById(id);
+
+        if (optional.isPresent()) {
+            Reclamation reclamation = optional.get();
+            String currentStatus = reclamation.getStatus();
+
+            switch (currentStatus) {
+                case "En_Attente":
+                    reclamation.setStatus("En_cours");
+                    break;
+                case "En_cours":
+                    reclamation.setStatus("Terminer");
+                    break;
+                case "Terminer":
+                    return ResponseEntity.ok("Reclamation already completed.");
+                default:
+                    return ResponseEntity.badRequest().body("Invalid current status: " + currentStatus);
+            }
+
+            reclamationRepository.save(reclamation);
+            return ResponseEntity.ok("Status updated to: " + reclamation.getStatus());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Reclamation with ID " + id + " not found");
+        }
+    }
+
+
+
+
+
+
+
 
 
 

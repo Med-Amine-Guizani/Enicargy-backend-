@@ -25,6 +25,8 @@ public class Reclamation {
     private String description;
     private String local;
     private String salle;
+
+    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'En_Attente'",insertable = false)
     private String status;
 
 
