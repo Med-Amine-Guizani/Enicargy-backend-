@@ -1,4 +1,4 @@
-package org.example.backendenicargy;
+package org.example.backendenicargy.Models;
 
 import jakarta.persistence.*;
 import lombok.*;

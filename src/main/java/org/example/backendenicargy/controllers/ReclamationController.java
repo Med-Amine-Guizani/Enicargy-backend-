@@ -1,7 +1,7 @@
 package org.example.backendenicargy.controllers;
 
 import jakarta.validation.Valid;
-import org.example.backendenicargy.Reclamation;
+import org.example.backendenicargy.Models.Reclamation;
 import org.example.backendenicargy.dto.ReclamationDTO;
 import org.example.backendenicargy.dto.ReclamationStatusDTO;
 import org.example.backendenicargy.repositories.ReclamationRepository;
