@@ -1,4 +1,4 @@
-package org.example.backendenicargy.repositories;
+package org.example.backendenicargy.Repositories;
 
 import org.example.backendenicargy.Models.Reclamation;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,10 +1,10 @@
-package org.example.backendenicargy.controllers;
+package org.example.backendenicargy.Controllers;
 
 import jakarta.validation.Valid;
 import org.example.backendenicargy.Models.Reclamation;
-import org.example.backendenicargy.dto.ReclamationDTO;
-import org.example.backendenicargy.dto.ReclamationStatusDTO;
-import org.example.backendenicargy.repositories.ReclamationRepository;
+import org.example.backendenicargy.Dto.ReclamationDTO;
+import org.example.backendenicargy.Dto.ReclamationStatusDTO;
+import org.example.backendenicargy.Repositories.ReclamationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

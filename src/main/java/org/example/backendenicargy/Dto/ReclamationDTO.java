@@ -1,4 +1,4 @@
-package org.example.backendenicargy.dto;
+package org.example.backendenicargy.Dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

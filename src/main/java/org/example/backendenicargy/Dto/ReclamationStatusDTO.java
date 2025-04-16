@@ -1,4 +1,4 @@
-package org.example.backendenicargy.dto;
+package org.example.backendenicargy.Dto;
 
 public class ReclamationStatusDTO {
     private long en_attente;
