@@ -1,11 +1,14 @@
 package org.example.backendenicargy.Controllers;
 
 
+import jakarta.validation.constraints.Null;
 import lombok.Data;
+import org.example.backendenicargy.Dto.UserDTO;
 import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.UserRepository;
 import org.example.backendenicargy.Security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +29,19 @@ public class AuthController {
     @Autowired private org.example.backendenicargy.Security.UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepo.save(user);
-        return "User registered";
+    public ResponseEntity<User> register(@RequestBody UserDTO dto) {
+        if(userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }else{
+            User user = new User();
+            user.setEmail(dto.getEmail());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            user.setRole(dto.getRole());
+            user.setUserName(dto.getUsername());
+            userRepo.save(user);
+            return ResponseEntity.ok(user);
+        }
+
     }
 
     @PostMapping("/login")

@@ -3,6 +3,7 @@ package org.example.backendenicargy.Models;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 
 
 @Getter
@@ -34,7 +35,8 @@ public class Reclamation {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",updatable = false , insertable = false)
     private String date;
 
-    private Long userid;
+    @ManyToOne
+    private User user;
 
 
     private String photourl;

@@ -1,7 +1,10 @@
 package org.example.backendenicargy.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,5 +37,8 @@ public class User {
     @Column(nullable=false)
     private String role ; //admin or other
 
+    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL , orphanRemoval=true)
+    @JsonIgnore
+    private List<Reclamation> reclamationList;
 
 }

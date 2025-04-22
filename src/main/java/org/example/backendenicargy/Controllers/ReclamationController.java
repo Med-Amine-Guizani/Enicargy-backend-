@@ -4,7 +4,10 @@ import jakarta.validation.Valid;
 import org.example.backendenicargy.Models.Reclamation;
 import org.example.backendenicargy.Dto.ReclamationDTO;
 import org.example.backendenicargy.Dto.ReclamationStatusDTO;
+import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.ReclamationRepository;
+import org.example.backendenicargy.Services.ReclamationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +28,8 @@ import java.util.UUID;
 public class ReclamationController {
     //-------------------------------------------------Definitions+Constructor-------------------------------------------------------------------------------------------
     private ReclamationRepository reclamationRepository;
+    @Autowired
+    private ReclamationService reclamationService;
 
 
 
@@ -47,9 +52,9 @@ public class ReclamationController {
 
     @GetMapping("/api/v1/reclamation/stats/{userid}")
     public ResponseEntity<ReclamationStatusDTO> getStatusCountsByUser(@PathVariable Long userId) {
-        long enAttenteCount = reclamationRepository.countByUseridAndStatus(userId, "En_Attente");
-        long enCoursCount = reclamationRepository.countByUseridAndStatus(userId, "En_cours");
-        long terminerCount = reclamationRepository.countByUseridAndStatus(userId, "Terminer");
+        long enAttenteCount = reclamationRepository.countByUser_idAndStatus(userId, "En_Attente");
+        long enCoursCount = reclamationRepository.countByUser_idAndStatus(userId, "En_cours");
+        long terminerCount = reclamationRepository.countByUser_idAndStatus(userId, "Terminer");
 
         ReclamationStatusDTO result = new ReclamationStatusDTO(enAttenteCount, enCoursCount, terminerCount);
         return ResponseEntity.ok(result);
@@ -88,7 +93,18 @@ public class ReclamationController {
         reclamation.setLocal(dto.getLocal());
         reclamation.setSalle(dto.getSalle());
         reclamation.setStatus("En-Attente");
-        reclamation.setUserid(dto.getUserid());
+
+
+        Optional<User> opUser=reclamationService.userForRec(dto.getUserid());
+        if(opUser.isPresent()){
+            User user = opUser.get();
+            reclamation.setUser(user);
+        }else{
+            ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+        }
+
+
+
         Reclamation saved = reclamationRepository.save(reclamation);
         return ResponseEntity.ok().body(saved);
     }
