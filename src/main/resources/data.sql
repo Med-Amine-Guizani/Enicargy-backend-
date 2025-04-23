@@ -3,7 +3,7 @@
 delete from reclamation ;
 
 INSERT INTO  user (email, password, role, user_name) values
-                                                         ("amine@gmail.com","amine","Admin","amine");
+                                                         ("amine@gmail.com","$2a$10$R3Ok4nzy76NOFAlsUMa0w.Sxa09f.Zhcg48lEGCKQoYWZtRnMmlMW","ADMIN","amine");
 
 INSERT INTO reclamation (titre, description, local, salle,User_id) VALUES
                                                                                 ('Projecteur non fonctionnel', 'Le projecteur de la salle S12 ne s’allume plus malgré plusieurs tentatives.', 'Principal', 'S12',  1),

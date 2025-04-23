@@ -41,4 +41,7 @@ public class User {
     @JsonIgnore
     private List<Reclamation> reclamationList;
 
+
+
+
 }

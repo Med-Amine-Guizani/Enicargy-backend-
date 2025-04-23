@@ -1,8 +1,10 @@
 package org.example.backendenicargy.Controllers;
 
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
 import lombok.Data;
+import lombok.extern.java.Log;
 import org.example.backendenicargy.Dto.UserDTO;
 import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.UserRepository;
@@ -13,11 +15,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("api/v1/auth")
 public class AuthController {
@@ -29,8 +29,9 @@ public class AuthController {
     @Autowired private org.example.backendenicargy.Security.UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody UserDTO dto) {
+    public ResponseEntity<LoginResponse> register( @RequestBody UserDTO dto) {
         if(userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            System.out.println("Email already exists");
             return ResponseEntity.badRequest().build();
         }else{
             User user = new User();
@@ -39,19 +40,47 @@ public class AuthController {
             user.setRole(dto.getRole());
             user.setUserName(dto.getUsername());
             userRepo.save(user);
-            return ResponseEntity.ok(user);
+
+
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+            );
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(dto.getEmail());
+            String token = jwtService.generateToken(userDetails);
+
+            return ResponseEntity.ok(new LoginResponse(token));
+
         }
 
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        return jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(userDetails);
+
+        return ResponseEntity.ok(new LoginResponse(token));
+    }
+    @Data
+    public class LoginResponse {
+        private String accessToken;
+
+        public LoginResponse(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
     }
 
     @Data
