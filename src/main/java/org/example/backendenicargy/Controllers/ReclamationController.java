@@ -1,6 +1,7 @@
 package org.example.backendenicargy.Controllers;
 
 import jakarta.validation.Valid;
+import org.example.backendenicargy.Dto.ReclamationStatusUserDTO;
 import org.example.backendenicargy.Models.Reclamation;
 import org.example.backendenicargy.Dto.ReclamationDTO;
 import org.example.backendenicargy.Dto.ReclamationStatusDTO;
@@ -23,25 +24,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200" , allowedHeaders = "*")
 @RestController
 public class ReclamationController {
     //-------------------------------------------------Definitions+Constructor-------------------------------------------------------------------------------------------
     private ReclamationRepository reclamationRepository;
     @Autowired
     private ReclamationService reclamationService;
-
-
-
     public ReclamationController(ReclamationRepository reclamationRepository) {
         this.reclamationRepository = reclamationRepository;
     }
-
-
-
-
 
 
     //-----------------------------------------------------Get Route Controllers -------------------------------------------------------------------------------------------------
@@ -49,7 +44,6 @@ public class ReclamationController {
     public List<Reclamation> getrec(){
         return reclamationRepository.findAll();
     }
-
 
 
     @GetMapping("/api/v1/reclamation/stats/{userid}")
@@ -61,19 +55,6 @@ public class ReclamationController {
         ReclamationStatusDTO result = new ReclamationStatusDTO(enAttenteCount, enCoursCount, terminerCount);
         return ResponseEntity.ok(result);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //----------------------------------------------------------Post Route Controllers --------------------------------------------------------------------------------------------------
     //this is a post method which allows users to insert reclamation into database only with title desc salle loc and userID
@@ -94,7 +75,7 @@ public class ReclamationController {
         reclamation.setDescription(dto.getDescription());
         reclamation.setLocal(dto.getLocal());
         reclamation.setSalle(dto.getSalle());
-        reclamation.setStatus("En-Attente");
+        reclamation.setStatus("En_Attente");
 
 
         Optional<User> opUser=reclamationService.userForRec(dto.getUserid());
@@ -110,7 +91,6 @@ public class ReclamationController {
         Reclamation saved = reclamationRepository.save(reclamation);
         return ResponseEntity.ok().body(saved);
     }
-
 
     @PostMapping("/api/v1/photo/{id}")
     public ResponseEntity<Reclamation> updatePhoto(
@@ -142,7 +122,6 @@ public class ReclamationController {
         }catch(IOException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
 
     }
 
@@ -272,7 +251,14 @@ public class ReclamationController {
         }
     }
 
+    @GetMapping("api/v1/reclamations/user/{userId}")
+    public List<ReclamationStatusUserDTO> getReclamationsByUser(@PathVariable Long userId) {
+        List<Reclamation> reclamations = reclamationRepository.findByUserId(userId);
 
+        return reclamations.stream()
+                .map(rec -> new ReclamationStatusUserDTO(rec.getDate(), rec.getStatus(), rec.getTitre()))
+                .collect(Collectors.toList());
+    }
 
 
 
