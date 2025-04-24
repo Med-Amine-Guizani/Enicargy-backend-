@@ -30,6 +30,4 @@ public class ReclamationDTO {
     private Long userid;
 
 
-
-
 }

@@ -1,11 +1,14 @@
 package org.example.backendenicargy.Controllers;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
+import org.example.backendenicargy.Dto.ReclamationStatusUserDTO;
 import org.example.backendenicargy.Models.Reclamation;
 import org.example.backendenicargy.Dto.ReclamationDTO;
 import org.example.backendenicargy.Dto.ReclamationStatusDTO;
 import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.ReclamationRepository;
+import org.example.backendenicargy.Repositories.UserRepository;
 import org.example.backendenicargy.Services.ReclamationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @CrossOrigin(origins = "http://localhost:4200" , allowedHeaders = "*")
@@ -32,48 +36,35 @@ public class ReclamationController {
     private ReclamationRepository reclamationRepository;
     @Autowired
     private ReclamationService reclamationService;
-
-
+    @Autowired
+    private UserRepository userRepository;
 
     public ReclamationController(ReclamationRepository reclamationRepository) {
         this.reclamationRepository = reclamationRepository;
     }
 
 
-
-
-
-
     //-----------------------------------------------------Get Route Controllers -------------------------------------------------------------------------------------------------
+      //---------------------------Get all reclamations-------------
     @GetMapping("/api/v1/reclamations")
     public List<Reclamation> getrec(){
         return reclamationRepository.findAll();
     }
 
-
-
-    @GetMapping("/api/v1/reclamation/stats/{userid}")
+    //---------------------------Get count of reclamations par statut-------------
+    @GetMapping("/api/v1/reclamation/stats/{userId}")
     public ResponseEntity<ReclamationStatusDTO> getStatusCountsByUser(@PathVariable Long userId) {
-        long enAttenteCount = reclamationRepository.countByUser_idAndStatus(userId, "En_Attente");
-        long enCoursCount = reclamationRepository.countByUser_idAndStatus(userId, "En_cours");
-        long terminerCount = reclamationRepository.countByUser_idAndStatus(userId, "Terminer");
+        if(userRepository.findById(userId).isPresent()) {
+            long enAttenteCount = reclamationRepository.countByUser_idAndStatus(userId, "En_Attente");
+            long enCoursCount = reclamationRepository.countByUser_idAndStatus(userId, "En_cours");
+            long terminerCount = reclamationRepository.countByUser_idAndStatus(userId, "Terminer");
+            ReclamationStatusDTO result = new ReclamationStatusDTO(enAttenteCount, enCoursCount, terminerCount);
+            return ResponseEntity.ok(result);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
 
-        ReclamationStatusDTO result = new ReclamationStatusDTO(enAttenteCount, enCoursCount, terminerCount);
-        return ResponseEntity.ok(result);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //----------------------------------------------------------Post Route Controllers --------------------------------------------------------------------------------------------------
     //this is a post method which allows users to insert reclamation into database only with title desc salle loc and userID
@@ -94,7 +85,7 @@ public class ReclamationController {
         reclamation.setDescription(dto.getDescription());
         reclamation.setLocal(dto.getLocal());
         reclamation.setSalle(dto.getSalle());
-        reclamation.setStatus("En-Attente");
+        reclamation.setStatus("En_Attente");
 
 
         Optional<User> opUser=reclamationService.userForRec(dto.getUserid());
@@ -110,7 +101,6 @@ public class ReclamationController {
         Reclamation saved = reclamationRepository.save(reclamation);
         return ResponseEntity.ok().body(saved);
     }
-
 
     @PostMapping("/api/v1/photo/{id}")
     public ResponseEntity<Reclamation> updatePhoto(
@@ -143,53 +133,7 @@ public class ReclamationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //---------------------------------------------- Delete methode Route --------------------------------------------------------------------------------------
@@ -219,32 +163,9 @@ public class ReclamationController {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //-------------------------------------------Patch methodes-------------------------------------------------------------------
     @PatchMapping("api/v1/reclamations/status/{id}")
-    public ResponseEntity<String> advanceReclamationStatus(@PathVariable Long id) {
+    public ResponseEntity<Null> advanceReclamationStatus(@PathVariable Long id) {
         Optional<Reclamation> optional = reclamationRepository.findById(id);
 
         if (optional.isPresent()) {
@@ -259,20 +180,27 @@ public class ReclamationController {
                     reclamation.setStatus("Terminer");
                     break;
                 case "Terminer":
-                    return ResponseEntity.ok("Reclamation already completed.");
+                    return ResponseEntity.ok(null);
                 default:
-                    return ResponseEntity.badRequest().body("Invalid current status: " + currentStatus);
+                    return ResponseEntity.badRequest().body(null);
             }
 
             reclamationRepository.save(reclamation);
-            return ResponseEntity.ok("Status updated to: " + reclamation.getStatus());
+            return ResponseEntity.ok(null);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Reclamation with ID " + id + " not found");
+                    .body(null);
         }
     }
 
+    @GetMapping("api/v1/reclamations/user/{userId}")
+    public List<ReclamationStatusUserDTO> getReclamationsByUser(@PathVariable Long userId) {
+        List<Reclamation> reclamations = reclamationRepository.findByUserId(userId);
 
+        return reclamations.stream()
+                .map(rec -> new ReclamationStatusUserDTO(rec.getDate(), rec.getStatus(), rec.getTitre()))
+                .collect(Collectors.toList());
+    }
 
 
 
