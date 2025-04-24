@@ -40,12 +40,13 @@ public class ReclamationController {
 
 
     //-----------------------------------------------------Get Route Controllers -------------------------------------------------------------------------------------------------
+      //---------------------------Get all reclamations-------------
     @GetMapping("/api/v1/reclamations")
     public List<Reclamation> getrec(){
         return reclamationRepository.findAll();
     }
 
-
+    //---------------------------Get count of reclamations par statut-------------
     @GetMapping("/api/v1/reclamation/stats/{userid}")
     public ResponseEntity<ReclamationStatusDTO> getStatusCountsByUser(@PathVariable Long userId) {
         long enAttenteCount = reclamationRepository.countByUser_idAndStatus(userId, "En_Attente");
@@ -126,51 +127,6 @@ public class ReclamationController {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //---------------------------------------------- Delete methode Route --------------------------------------------------------------------------------------
 
     @DeleteMapping("api/v1/reclamations/{id}")
@@ -195,29 +151,6 @@ public class ReclamationController {
                     .body("Reclamation with ID " + id + " not found");
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
