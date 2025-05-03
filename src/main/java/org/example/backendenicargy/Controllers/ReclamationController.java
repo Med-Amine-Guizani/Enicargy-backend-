@@ -113,14 +113,9 @@ public class ReclamationController {
         String uploadDir = "uploads/";
         File dir = new File(uploadDir);
         if(!dir.exists()){dir.mkdirs();}
-
-
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir, filename);
-
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-
         Optional<Reclamation> optional = reclamationRepository.findById(id);
         if (optional.isPresent()) {
                 Reclamation reclamation = optional.get();
