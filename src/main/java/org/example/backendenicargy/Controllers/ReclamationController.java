@@ -8,6 +8,7 @@ import org.example.backendenicargy.Dto.ReclamationStatusDTO;
 import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.ReclamationRepository;
 import org.example.backendenicargy.Services.ReclamationService;
+import org.hibernate.boot.jaxb.SourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ public class ReclamationController {
     //-----------------------------------------------------Get Route Controllers -------------------------------------------------------------------------------------------------
     @GetMapping("/api/v1/reclamations")
     public List<Reclamation> getrec(){
+
         return reclamationRepository.findAll();
     }
 

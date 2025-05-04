@@ -30,6 +30,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<LoginResponse> register( @RequestBody UserDTO dto) {
+        System.out.println(dto);
         if(userRepo.findByEmail(dto.getEmail()).isPresent()) {
             System.out.println("Email already exists");
             return ResponseEntity.badRequest().build();

@@ -4,6 +4,7 @@ package org.example.backendenicargy.Configs;
 import org.example.backendenicargy.Security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.*;
@@ -19,12 +20,19 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+
+
         http
+                .csrf(csrf -> csrf.disable()) // Désactiver CSRF pour les tests, attention en production
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/consommation/scrapped-data").permitAll() // Ajouter cette ligne
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
