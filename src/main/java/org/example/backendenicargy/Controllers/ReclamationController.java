@@ -2,15 +2,12 @@ package org.example.backendenicargy.Controllers;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
-import org.example.backendenicargy.Dto.ReclamationStatusUserDTO;
+import org.example.backendenicargy.Dto.*;
 import org.example.backendenicargy.Models.Reclamation;
-import org.example.backendenicargy.Dto.ReclamationDTO;
-import org.example.backendenicargy.Dto.ReclamationStatusDTO;
 import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.ReclamationRepository;
 import org.example.backendenicargy.Repositories.UserRepository;
 import org.example.backendenicargy.Services.ReclamationService;
-import org.hibernate.boot.jaxb.SourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -53,7 +48,7 @@ public class ReclamationController {
         return reclamationRepository.findAll();
     }
 
-    //---------------------------Get count of reclamations par statut-------------
+    //---------------------------Get count of reclamations by status for an user-------------
     @GetMapping("/api/v1/reclamation/stats/{userId}")
     public ResponseEntity<ReclamationStatusDTO> getStatusCountsByUser(@PathVariable Long userId) {
         if(userRepository.findById(userId).isPresent()) {
@@ -67,6 +62,66 @@ public class ReclamationController {
         }
 
     }
+
+
+    //-------------------------Get count of reclamations by status----------------
+
+
+    private static final String[] MOIS_LABELS = {
+            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+    };
+
+    @GetMapping("/api/v1/reclamation/reclamation-by-month")
+    public ResponseEntity<List<ReclamationByMonthDTO>> getReclamationByMonth() {
+        List<ReclamationRepository.MonthlyReclamationStats> stats =
+                reclamationRepository.countMonthlyStats();
+
+        List<ReclamationByMonthDTO> result = new ArrayList<>();
+        for (ReclamationRepository.MonthlyReclamationStats s : stats) {
+            String moisNom = MOIS_LABELS[s.getMois() - 1];
+            result.add(new ReclamationByMonthDTO(
+                    moisNom,
+                    s.getTotal(),
+                    s.getTerminees()
+            ));
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/api/v1/reclamation/status-by-month")
+    public ResponseEntity<List<ReclamationStatusMonthDTO>> getStatusByMonth() {
+        List<ReclamationRepository.MonthlyReclamationStatus> stats =
+                reclamationRepository.countMonthlyStatus();
+
+        List<ReclamationStatusMonthDTO> result = new ArrayList<>();
+        for (ReclamationRepository.MonthlyReclamationStatus s : stats) {
+            String moisNom = MOIS_LABELS[s.getMois() - 1];
+            result.add(new ReclamationStatusMonthDTO(
+                    moisNom,
+                    s.getEnAttente(),
+                    s.getTerminees(),
+                    s.getEnCours()
+            ));
+        }
+        return ResponseEntity.ok(result);
+    }
+
+
+
+    //--------------------------Get count of reclamations by Status of reclament----------
+    @GetMapping("/api/v1/reclamation/statusUser")
+
+    public ResponseEntity<ReclamationByRoleDTO> getReclamationCountByRole() {
+        long etudiantCount = reclamationRepository.countByUserRole("Etudiant");
+        long enseigneantCount = reclamationRepository.countByUserRole("Enseigneant");
+        long personnelCount = reclamationRepository.countByUserRole("Personnel");
+
+        ReclamationByRoleDTO result = new ReclamationByRoleDTO(etudiantCount, enseigneantCount, personnelCount);
+        return ResponseEntity.ok(result);
+    }
+
+
 
     //----------------------------------------------------------Post Route Controllers --------------------------------------------------------------------------------------------------
     //this is a post method which allows users to insert reclamation into database only with title desc salle loc and userID
