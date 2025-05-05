@@ -33,5 +33,8 @@ build/
 .vscode/
 
 
-application.propreties
-./uploads
+src/main/resources/application.propreties
+uploads
+
+
+src/main/resources/your-log-file.log
