@@ -32,7 +32,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/consommation/scrapped-data").permitAll() // Ajouter cette ligne
+                        .requestMatchers("/api/equipments/**").permitAll()    //hasRole("admin")
+                        .requestMatchers("/api/consommation/scrapped-data").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
