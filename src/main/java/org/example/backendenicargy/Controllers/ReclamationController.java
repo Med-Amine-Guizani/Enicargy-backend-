@@ -32,6 +32,9 @@ public class ReclamationController {
     @Autowired
     private ReclamationService reclamationService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/api/v1/reclamations")
     public List<Reclamation> getrec() {
         return reclamationService.getAllReclamations();
@@ -55,6 +58,11 @@ public class ReclamationController {
     @GetMapping("/api/v1/reclamation/statusUser")
     public ResponseEntity<ReclamationByRoleDTO> getReclamationCountByRole() {
         return reclamationService.getReclamationCountByRole();
+    }
+
+    @GetMapping ("/api/v1/reclamation/Countusers")
+    public int getReclamationUsers() {
+        return reclamationService.userCount();
     }
 
     @PostMapping("/api/v1/reclamations")

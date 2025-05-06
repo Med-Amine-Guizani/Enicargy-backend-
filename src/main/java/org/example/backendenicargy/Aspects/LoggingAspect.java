@@ -16,7 +16,8 @@ public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
   // Pointcut pour toutes les méthodes dans le package des controllers
-    @Pointcut("execution(* org.example.backendenicargy.*.*(..))")
+  @Pointcut("execution(* org.example.backendenicargy.Services.*.*(..)) || " +
+          "execution(* org.example.backendenicargy.Controllers.*.*(..))")
     public void Methods() {}
 
     @Before("Methods()")

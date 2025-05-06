@@ -42,8 +42,8 @@ VALUES (
 
 INSERT INTO equipment
 VALUES
-(50, 40, 5, 3, 1500,1, 'Table'),
-(100, 80, 10, 5, 1600,2, 'Chaise'),
+(50, 1000, 100, 3, 1100,1, 'Table'),
+(100, 900, 10, 5, 1000,2, 'Chaise'),
 (3, 25, 3, 2, 30,3 ,'Projecteur'),
 (10, 15, 2, 2, 25,4, 'Télévision '),
 (150, 130, 50, 10, 500,5, 'CâbleHDMI'),

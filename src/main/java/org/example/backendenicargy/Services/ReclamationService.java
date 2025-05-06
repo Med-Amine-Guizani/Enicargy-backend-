@@ -9,6 +9,7 @@ import org.example.backendenicargy.Models.User;
 import org.example.backendenicargy.Repositories.ReclamationRepository;
 import org.example.backendenicargy.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -198,6 +199,8 @@ public class ReclamationService {
         }
     }
 
+
+
     public List<ReclamationStatusUserDTO> getReclamationsByUser(Long userId) {
         List<Reclamation> reclamations = reclamationRepository.findByUserId(userId);
         return reclamations.stream()
@@ -207,5 +210,10 @@ public class ReclamationService {
 
     public Optional<User> userForRec(Long id) {
         return userRepository.findById(id);
+    }
+
+
+    public int userCount(){
+        return userRepository.findAll().size();
     }
 }
