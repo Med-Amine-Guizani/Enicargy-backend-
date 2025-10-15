@@ -16,17 +16,18 @@ public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
   // Pointcut pour toutes les méthodes dans le package des controllers
-    @Pointcut("execution(* org.example.backendenicargy.Controllers..*(..))")
-    public void controllerMethods() {}
+  @Pointcut("execution(* org.example.backendenicargy.Services.*.*(..)) || " +
+          "execution(* org.example.backendenicargy.Controllers.*.*(..))")
+    public void Methods() {}
 
-    @Before("controllerMethods()")
+    @Before("Methods()")
     public void logBefore(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().toShortString();
         Object[] args = joinPoint.getArgs();
         logger.info("➡️ [BEFORE] Appel de la méthode du controller : {} avec les arguments : {}", methodName, args);
     }
 
-    @After("controllerMethods()")
+    @After("Methods()")
     public void logAfter(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().toShortString();
         logger.info("✅ [AFTER] Fin d'exécution de la méthode du controller : {}", methodName);

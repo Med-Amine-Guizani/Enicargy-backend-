@@ -1,11 +1,9 @@
 package org.example.backendenicargy.Models;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -27,7 +25,15 @@ public class Article {
 
     private String title ;
 
-    private String body ;
+
+    @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String body;
+
+
+    @CreationTimestamp
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",updatable = false , insertable = false)
+    private String date;
 
 
 }

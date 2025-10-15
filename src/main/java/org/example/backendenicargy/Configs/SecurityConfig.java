@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("api/v1/auth/**").permitAll()
                         .requestMatchers("/api/equipments/**").permitAll()    //hasRole("admin")
                         .requestMatchers("/api/consommation/scrapped-data").permitAll()
